@@ -4,7 +4,7 @@
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
-
+#include "data.h"
 using namespace ftxui;
 
 void TUI::showAddForm(ScreenInteractive& screen) {
@@ -20,6 +20,7 @@ void TUI::showAddForm(ScreenInteractive& screen) {
             if (firstname.empty() || lastname.empty() || semester.empty() || avg.empty()) {
                 info = "Fields cannot be empty.";
             } else {
+                this->handler.add(firstname,lastname,avg,semester);
                 info = "Student added successfully!";
                 firstname.clear();
                 lastname.clear();
@@ -74,21 +75,37 @@ void TUI::showRemoveForm(ScreenInteractive& screen) {
 }
 
 void TUI::showList(ScreenInteractive& screen) {
-    auto back_button = Button("Back", screen.ExitLoopClosure());
+    Student* tmp = this->handler.list();
+    
+    int studentCount = this->handler.getSize();
 
+    std::vector<Element> studentElements;
+    for (int i = 0; i < studentCount; ++i) {
+        std::string studentInfo = "ID: " + std::to_string(tmp[i].getId()) +
+                                  ", Name: " + tmp[i].getFirstName() + " " + tmp[i].getLastName() +
+                                  ", Avg: " + std::to_string(tmp[i].getAverage()) +
+                                  ", Semester: " + std::to_string(tmp[i].getSemester());
+        studentElements.push_back(text(studentInfo) | center);
+    }
+
+    auto back_button = Button("Back", screen.ExitLoopClosure());
+    
     auto container = Container::Vertical({
+        vbox(studentElements),
         back_button
     });
-
+    
     auto renderer = Renderer(container, [&] {
         return vbox({
             text("List All Students") | bold | center,
             text("Showing student list...") | center,
             separator(),
+            vbox(studentElements),
+            separator(),
             back_button->Render()
         }) | border;
     });
-
+    
     screen.Loop(renderer);
 }
 

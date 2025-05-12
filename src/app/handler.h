@@ -13,6 +13,7 @@ class Handler {
         std::string average, 
         std::string semester);
     void remove(std::string id);
-    
+    Student* list();
+    int getSize();
 
 };
