@@ -18,10 +18,14 @@ add_library(JiPP_project_smartArray INTERFACE)
 
 target_include_directories(JiPP_project_smartArray INTERFACE
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/smartArray
 )
 
 add_executable(JiPP_project_app
     src/app/main.cpp
+    src/app/tui.cpp
+    src/app/handler.cpp
+    src/app/data.cpp
 )
 
 target_link_libraries(JiPP_project_app
