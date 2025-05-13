@@ -14,11 +14,11 @@ private:
 public:
     Student();
     Student(std::string fname, std::string lname, double avg, int sem);
-    std::string getFirstName();
-    std::string getLastName();
-    int getSemester();
-    double getAverage();
-    int getId();
-
+    Student(int id,std::string fname, std::string lname, double avg, int sem);
+    std::string getFirstName() const;
+    std::string getLastName() const;
+    int getSemester() const;
+    double getAverage() const;
+    int getId() const;
     friend std::ostream& operator<<(std::ostream& os, const Student& s);
 };

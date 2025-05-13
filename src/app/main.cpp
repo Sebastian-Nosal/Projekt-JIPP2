@@ -2,7 +2,14 @@
 #include "handler.h"
 
 int main() {
-    Handler handler;
-    TUI t(handler); 
-    return 0;
+    try {
+        Handler handler;
+        TUI tui(handler);
+    } catch (const std::system_error& e) {
+        std::cerr << "System error: " << e.what() << std::endl;
+        return 1;
+    } catch (const std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+        return 1;
+    }
 }

@@ -10,9 +10,16 @@ Student::Student(std::string fname,std::string lname, double avg,int sem) {
     this->semester = sem;
 }
 
+Student::Student(int id,std::string fname, std::string lname, double avg, int sem) {
+    this->id = id;
+    this->firstname = fname;
+    this->lastname = lname;
+    this->average = avg;
+    this->semester = sem;
+}
+
 Student::Student() {
-    this->id = next_id;
-    next_id++;
+    this->id = 0;
     this->firstname = "";
     this->lastname = "";
     this->average = 0.0;
@@ -27,22 +34,22 @@ std::ostream& operator<<(std::ostream& os, const Student& s) {
     return os;
 }
 
-std::string Student::getFirstName() {
+std::string Student::getFirstName() const {
     return this->firstname;
 }
 
-std::string Student::getLastName() {
+std::string Student::getLastName() const {
     return this->lastname;
 }
 
-int Student::getSemester() {
+int Student::getSemester() const {
     return this->semester;
 }
 
-double Student::getAverage() {
+double Student::getAverage() const {
     return this->average;
 }
 
-int Student::getId() {
+int Student::getId() const {
     return this->id;
 }
