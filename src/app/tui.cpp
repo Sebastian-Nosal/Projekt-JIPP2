@@ -5,6 +5,7 @@
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
 #include "data.h"
+
 using namespace ftxui;
 
 void TUI::showAddForm(ScreenInteractive& screen) {
@@ -77,51 +78,35 @@ void TUI::showRemoveForm(ScreenInteractive& screen) {
 void TUI::showList(ScreenInteractive& screen) {
     Student* tmp = this->handler.list();
     int studentCount = this->handler.getSize();
+    std::vector<Component> list_elems;
 
-    /*
-    std::vector<std::string> studentInfoList;
-    for (int i = 0; i < studentCount; ++i) {
-        std::string studentInfo = "ID: " + std::to_string(tmp[i].getId()) +
-                                  ", Name: " + tmp[i].getFirstName() + " " + tmp[i].getLastName() +
-                                  ", Avg: " + std::to_string(tmp[i].getAverage()) +
-                                  ", Semester: " + std::to_string(tmp[i].getSemester());
-        studentInfoList.push_back(studentInfo);
+    for (int i = 0; i < studentCount; i++) {
+        std::string element_content = 
+            "ID: " + std::to_string(tmp[i].getId()) + " " +
+            tmp[i].getFirstName() + " " + tmp[i].getLastName() +
+            " Semester: " + std::to_string(tmp[i].getSemester()) +
+            " Avg: " + std::to_string(tmp[i].getAverage());
+
+        list_elems.push_back(ftxui::Renderer([element_content] {
+            return ftxui::text(element_content);
+        }));
     }
 
-    auto menu = ftxui::Menu(&studentInfoList, 0);  // 0 to indeks początkowy
-
+    // Dodajemy przycisk jako komponent
     auto back_button = ftxui::Button("Back", screen.ExitLoopClosure());
+    list_elems.push_back(back_button);  // <- to jest kluczowe!
 
-    auto container = ftxui::Container::Vertical({
-        menu,
-        back_button
-    });
+    // Kontener zawierający wszystkie elementy + przycisk
+    auto container = ftxui::Container::Vertical(list_elems);
 
-        auto renderer = ftxui::Renderer(container, [&] {
-        return ftxui::vbox({
-            ftxui::text("List of Students") | ftxui::bold | ftxui::center,
-            ftxui::separator(),
-            menu->Render(),
-            ftxui::separator(),
-            back_button->Render()
-        }) | ftxui::border;
-    });
-    */
-
-    auto back_button = ftxui::Button("Back", screen.ExitLoopClosure());
-
-    auto container = ftxui::Container::Vertical({
-        back_button
-    });
     auto renderer = ftxui::Renderer(container, [&] {
         return ftxui::vbox({
             ftxui::text("List of Students") | ftxui::bold | ftxui::center,
             ftxui::separator(),
-            ftxui::text(tmp[0].getFirstName()),
-            ftxui::separator(),
-            back_button->Render()
+            container->Render()
         }) | ftxui::border;
     });
+
     screen.Loop(renderer);
 }
 

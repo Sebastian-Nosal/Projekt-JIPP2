@@ -1,4 +1,5 @@
 #include "data.h"
+
 int Student::next_id = 0; 
 Student::Student(std::string fname,std::string lname, double avg,int sem) {
     this->id = next_id;
