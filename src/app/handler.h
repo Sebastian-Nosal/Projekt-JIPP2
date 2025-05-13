@@ -26,4 +26,6 @@ class Handler {
     bool saveToBinary();
     bool loadFromFile();
     bool saveToFile();
+    double getAverageOfSemester(int semester);
+    Student* getBestStudents(int& amount); 
 };

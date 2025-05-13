@@ -6,7 +6,11 @@ Student::Student(std::string fname,std::string lname, double avg,int sem) {
     next_id++;
     this->firstname = fname;
     this->lastname = lname;
+    if(avg<2.0) avg=2.0;
+    if(avg>5.0) avg=5.0;
     this->average = avg;
+    if(sem<1) sem=1;
+    if(sem>8) sem=8;
     this->semester = sem;
 }
 
@@ -14,7 +18,11 @@ Student::Student(int id,std::string fname, std::string lname, double avg, int se
     this->id = id;
     this->firstname = fname;
     this->lastname = lname;
+    if(avg<2.0) avg=2.0;
+    if(avg>5.0) avg=5.0;
     this->average = avg;
+    if(sem<1) sem=1;
+    if(sem>8) sem=8;
     this->semester = sem;
 }
 

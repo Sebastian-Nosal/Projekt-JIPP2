@@ -108,7 +108,7 @@ void TUI::showList(ScreenInteractive& screen) {
             container->Render()
         }) | ftxui::border;
     });
-
+    delete[] tmp;
     screen.Loop(renderer);
 }
 
@@ -153,25 +153,64 @@ void TUI::showUpdateForm(ScreenInteractive& screen) {
 }
 
 void TUI::showAvgBySemester(ScreenInteractive& screen) {
-    screen.Loop(Renderer(Container::Vertical({
-        Button("Back", screen.ExitLoopClosure())
-    }), [] {
-        return vbox({
-            text("Average by Semester") | bold | center,
-            text("Feature coming soon...") | center
-        }) | border;
-    }));
+
+    std::vector<Component> list_elems;
+
+    for (int i = 1; i <=8; i++) {
+        std::string element_content = "Semester "+ std::to_string(i)+ " : "+std::to_string(this->handler.getAverageOfSemester(i));
+
+        list_elems.push_back(ftxui::Renderer([element_content] {
+            return ftxui::text(element_content);
+        }));
+    }
+
+    auto back_button = ftxui::Button("Back", screen.ExitLoopClosure());
+    list_elems.push_back(back_button);  // <- to jest kluczowe!
+
+    auto container = ftxui::Container::Vertical(list_elems);
+
+    auto renderer = ftxui::Renderer(container, [&] {
+        return ftxui::vbox({
+            ftxui::text("Average of each semester") | ftxui::bold | ftxui::center,
+            ftxui::separator(),
+            container->Render()
+        }) | ftxui::border;
+    });
+
+    screen.Loop(renderer);
 }
 
 void TUI::showBestStudent(ScreenInteractive& screen) {
-    screen.Loop(Renderer(Container::Vertical({
-        Button("Back", screen.ExitLoopClosure())
-    }), [] {
-        return vbox({
-            text("Best Student(s)") | bold | center,
-            text("Feature coming soon...") | center
-        }) | border;
-    }));
+    int amount;
+    Student* tmp = this->handler.getBestStudents(amount);
+    std::vector<Component> list_elems;
+
+    for (int i = 0; i < amount; i++) {
+        std::string element_content = 
+            "ID: " + std::to_string(tmp[i].getId()) + " " +
+            tmp[i].getFirstName() + " " + tmp[i].getLastName() +
+            " Semester: " + std::to_string(tmp[i].getSemester()) +
+            " Avg: " + std::to_string(tmp[i].getAverage());
+
+        list_elems.push_back(ftxui::Renderer([element_content] {
+            return ftxui::text(element_content);
+        }));
+    }
+
+    auto back_button = ftxui::Button("Back", screen.ExitLoopClosure());
+    list_elems.push_back(back_button);
+
+    auto container = ftxui::Container::Vertical(list_elems);
+
+    auto renderer = ftxui::Renderer(container, [&] {
+        return ftxui::vbox({
+            ftxui::text("List of Students") | ftxui::bold | ftxui::center,
+            ftxui::separator(),
+            container->Render()
+        }) | ftxui::border;
+    });
+
+    screen.Loop(renderer);
 }
 
 void TUI::showByFirstname(ftxui::ScreenInteractive& screen) {
@@ -569,6 +608,11 @@ TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
         "Load From File",
         "Save To Binary File",
         "Load From Binary File",
+        "Show nth",
+        "Show from n to k",
+        "Get By fullname",
+        "Average by firstname",
+        "Overall average",
         "Exit"
     };
 
@@ -625,6 +669,16 @@ TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
                         info_message = "Failed to load binary file.";
                     break;
                 case 16:
+                    break;
+                case 17:
+                    break;
+                case 18:
+                    break;
+                case 19:
+                    break;
+                case 20:
+                    break;
+                case 21:
                     screen.Exit();
                     break;
                 default:

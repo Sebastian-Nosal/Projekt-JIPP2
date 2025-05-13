@@ -124,3 +124,42 @@ bool Handler::saveToBinary() {
 bool Handler::loadFromBinary() {
     return true;
 }
+
+double Handler::getAverageOfSemester(int semester) {
+    int sum =0;
+    int count = 0;
+    int size = this->data.size();
+    for(int i=0;i<size;i++) {
+        if(this->data[i].getSemester()==semester) {
+            count++;
+            sum+=this->data[i].getAverage();
+        }
+    }
+    if(count==0) return 0;
+    return sum/count;
+}
+
+Student* Handler::getBestStudents(int& amount) {
+    int size = this->data.size();
+    double max = 0;
+    int count = 0;
+    for(int i=0; i<size;i++) {
+        if(this->data[i].getAverage()>max){
+            max = this->data[i].getAverage();
+            count = 1;
+        } 
+        else if(this->data[i].getAverage() == max) count++;
+    }
+    
+    Student* result = new Student[count];
+    int j=0;
+    for(int i=0; i<size;i++) {
+        if(this->data[i].getAverage() == max) {
+            result[j] = this->data[i];
+            j++;
+        }
+    }
+    amount = count;
+    return result;
+
+} 
