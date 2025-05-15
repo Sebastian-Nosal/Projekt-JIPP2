@@ -842,6 +842,29 @@ void TUI::showOverallAverage(ftxui::ScreenInteractive& screen) {
     screen.Loop(renderer);
 }
 
+void TUI::showSize(ftxui::ScreenInteractive& screen) {
+    double size = handler.getOverallAverage();
+    std::string size_text = "Average: " + std::to_string(size);
+
+    auto back_button = ftxui::Button("Back", screen.ExitLoopClosure());
+
+    auto container = ftxui::Container::Vertical({
+        back_button
+    });
+
+    auto renderer = ftxui::Renderer(container, [&] {
+        return ftxui::vbox({
+            ftxui::text("Size: ") | ftxui::bold | ftxui::center,
+            ftxui::separator(),
+            ftxui::text(size_text) | ftxui::center,
+            ftxui::separator(),
+            back_button->Render()
+        }) | ftxui::border;
+    });
+
+    screen.Loop(renderer);
+}
+
 TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
     auto screen = ScreenInteractive::TerminalOutput();
 
@@ -870,6 +893,7 @@ TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
         "Get By fullname",
         "Average by semester",
         "Overall average",
+        "Get size of dataset"
         "Exit"
     };
 
@@ -930,7 +954,8 @@ TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
                 case 18: showByFullName(screen); break;
                 case 19: showAvgByGivenSemester(screen); break;
                 case 20: showOverallAverage(screen); break;
-                case 21:
+                case 21: showSize(screen); break;
+                case 22:
                     screen.Exit();
                     break;
                 default:
