@@ -20,5 +20,6 @@ public:
     int getSemester() const;
     double getAverage() const;
     int getId() const;
+    
     friend std::ostream& operator<<(std::ostream& os, const Student& s);
 };

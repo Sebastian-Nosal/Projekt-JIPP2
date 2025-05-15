@@ -585,6 +585,263 @@ void TUI::showBelowSemester(ftxui::ScreenInteractive& screen) {
     screen.Loop(renderer);
 }
 
+void TUI::showNth(ftxui::ScreenInteractive& screen) {
+    std::string input;
+    std::string error_message;
+    std::string result_line;
+
+    auto form = ftxui::Container::Vertical({
+        ftxui::Input(&input, "Enter index"),
+        ftxui::Button("Search", [&] {
+            try {
+                int index = std::stoi(input);
+                Student s = handler.getByIdx(index);
+
+                if (s.getId() == -1) {
+                    result_line = "Error: Index Out Of Range";
+                } else {
+                    result_line = "ID: " + std::to_string(s.getId()) + " " +
+                                  s.getFirstName() + " " + s.getLastName() +
+                                  " Semester: " + std::to_string(s.getSemester()) +
+                                  " Avg: " + std::to_string(s.getAverage());
+                }
+                error_message.clear();
+            } catch (const std::exception& e) {
+                error_message = "Invalid input. Please enter a valid number.";
+                result_line.clear();  
+            }
+
+            input.clear();
+            screen.PostEvent(ftxui::Event::Custom); 
+        }),
+        ftxui::Button("Back", screen.ExitLoopClosure())
+    });
+
+    auto renderer = ftxui::Renderer(form, [&] {
+        std::vector<ftxui::Element> elements;
+        elements.push_back(ftxui::text("Search by Index") | ftxui::bold | ftxui::center);
+        elements.push_back(ftxui::separator());
+        elements.push_back(form->Render());
+
+        if (!error_message.empty()) {
+            elements.push_back(ftxui::separator());
+            elements.push_back(ftxui::text(error_message) | ftxui::color(ftxui::Color::Red));
+        }
+
+        if (!result_line.empty()) {
+            elements.push_back(ftxui::separator());
+            elements.push_back(ftxui::text(result_line));
+        }
+
+        return ftxui::vbox(std::move(elements)) | ftxui::border;
+    });
+
+    screen.Loop(renderer);
+}
+
+void TUI::showNtoK(ftxui::ScreenInteractive& screen) {
+    std::string input1, input2;
+
+    std::vector<ftxui::Component> list_elems;
+
+    auto form = ftxui::Container::Vertical({
+        ftxui::Input(&input1, "Enter start index"),
+        ftxui::Input(&input2, "Enter end index"),
+        ftxui::Button("Search", [&] {
+            inputValue = input1 + ";" + input2;
+            input1.clear();
+            input2.clear();
+            screen.PostEvent(ftxui::Event::Custom);  
+        }),
+        ftxui::Button("Back", screen.ExitLoopClosure())
+    });
+
+    auto renderer = ftxui::Renderer(form, [&] {
+        std::vector<ftxui::Element> elements;
+
+        elements.push_back(ftxui::text("Search by index brackets") | ftxui::bold | ftxui::center);
+        elements.push_back(ftxui::separator());
+        elements.push_back(form->Render());
+
+        if (!inputValue.empty()) {
+            int count = 0;
+            size_t pos = inputValue.find(";");
+            int n = std::stoi(inputValue.substr(0, pos));
+            int k = std::stoi(inputValue.substr(pos + 1));
+
+            Student* result = handler.getFromNtoK(n,k,count);
+
+            list_elems.clear();
+
+            elements.push_back(ftxui::separator());
+
+            if (count == 0 || result == nullptr) {
+                elements.push_back(ftxui::text("No matching students found."));
+            } else {
+                for (int i = 0; i < count; ++i) {
+                    const Student& s = result[i];
+                    std::string line = "ID: " + std::to_string(s.getId()) + " " +
+                                       s.getFirstName() + " " + s.getLastName() +
+                                       " Semester: " + std::to_string(s.getSemester()) +
+                                       " Avg: " + std::to_string(s.getAverage());
+                    elements.push_back(ftxui::text(line));
+                }
+                delete[] result;
+            }
+
+            inputValue.clear();
+        }
+
+        return ftxui::vbox(std::move(elements)) | ftxui::border;
+    });
+
+    screen.Loop(renderer);
+}
+
+void TUI::showByFullName(ftxui::ScreenInteractive& screen) {
+    std::string input1, input2;
+
+    std::vector<ftxui::Component> list_elems;
+
+    auto form = ftxui::Container::Vertical({
+        ftxui::Input(&input1, "Enter Firstname"),
+        ftxui::Input(&input2, "Enter Lastname"),
+
+        ftxui::Button("Search", [&] {
+            inputValue = input1 + input2;
+            input1.clear();
+            input2.clear();
+            screen.PostEvent(ftxui::Event::Custom);  
+        }),
+        ftxui::Button("Back", screen.ExitLoopClosure())
+    });
+
+    auto renderer = ftxui::Renderer(form, [&] {
+        std::vector<ftxui::Element> elements;
+
+        elements.push_back(ftxui::text("Search by semester") | ftxui::bold | ftxui::center);
+        elements.push_back(ftxui::separator());
+        elements.push_back(form->Render());
+
+        if (!inputValue.empty()) {
+            int count = 0;
+            Student* result = handler.listByCriteria(
+                [&](const Student& s) {
+                    try {
+                        return s.getFirstName() + s.getLastName() == inputValue;
+                    }
+                    catch(const std::invalid_argument&) {
+                        return false;
+                    }
+
+                },
+                count
+            );
+
+            list_elems.clear();
+
+            elements.push_back(ftxui::separator());
+
+            if (count == 0 || result == nullptr) {
+                elements.push_back(ftxui::text("No matching students found."));
+            } else {
+                for (int i = 0; i < count; ++i) {
+                    const Student& s = result[i];
+                    std::string line = "ID: " + std::to_string(s.getId()) + " " +
+                                       s.getFirstName() + " " + s.getLastName() +
+                                       " Semester: " + std::to_string(s.getSemester()) +
+                                       " Avg: " + std::to_string(s.getAverage());
+                    elements.push_back(ftxui::text(line));
+                }
+                delete[] result;
+            }
+
+            inputValue.clear();
+        }
+
+        return ftxui::vbox(std::move(elements)) | ftxui::border;
+    });
+
+    screen.Loop(renderer);
+}
+
+void TUI::showAvgByGivenSemester(ftxui::ScreenInteractive& screen) {
+    std::string input;
+    std::string error_message;
+    std::string result_line;
+
+    auto form = ftxui::Container::Vertical({
+        ftxui::Input(&input, "Enter semester"),
+        ftxui::Button("Search", [&] {
+            try {
+                int semester = std::stoi(input);
+                double avg = this->handler.getAverageOfSemester(semester);
+
+                if (avg == 0.0) {
+                    result_line = "Missing info about given semester";
+                } else {
+                    result_line = "Semester " + std::to_string(semester) +
+                                  " average: " + std::to_string(avg);
+                }
+
+                error_message.clear();
+            } catch (const std::exception& e) {
+                error_message = "Invalid input. Please enter a number.";
+                result_line.clear();
+            }
+
+            input.clear();
+            screen.PostEvent(ftxui::Event::Custom);  
+        }),
+        ftxui::Button("Back", screen.ExitLoopClosure())
+    });
+
+    auto renderer = ftxui::Renderer(form, [&] {
+        std::vector<ftxui::Element> elements;
+
+        elements.push_back(ftxui::text("Search by Semester") | ftxui::bold | ftxui::center);
+        elements.push_back(ftxui::separator());
+        elements.push_back(form->Render());
+
+        if (!error_message.empty()) {
+            elements.push_back(ftxui::separator());
+            elements.push_back(ftxui::text(error_message) | ftxui::color(ftxui::Color::Red));
+        }
+
+        if (!result_line.empty()) {
+            elements.push_back(ftxui::separator());
+            elements.push_back(ftxui::text(result_line));
+        }
+
+        return ftxui::vbox(std::move(elements)) | ftxui::border;
+    });
+
+    screen.Loop(renderer);
+}
+
+void TUI::showOverallAverage(ftxui::ScreenInteractive& screen) {
+    double avg = handler.getOverallAverage();
+    std::string avg_text = "Average: " + std::to_string(avg);
+
+    auto back_button = ftxui::Button("Back", screen.ExitLoopClosure());
+
+    auto container = ftxui::Container::Vertical({
+        back_button
+    });
+
+    auto renderer = ftxui::Renderer(container, [&] {
+        return ftxui::vbox({
+            ftxui::text("Average: ") | ftxui::bold | ftxui::center,
+            ftxui::separator(),
+            ftxui::text(avg_text) | ftxui::center,
+            ftxui::separator(),
+            back_button->Render()
+        }) | ftxui::border;
+    });
+
+    screen.Loop(renderer);
+}
+
 TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
     auto screen = ScreenInteractive::TerminalOutput();
 
@@ -611,7 +868,7 @@ TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
         "Show nth",
         "Show from n to k",
         "Get By fullname",
-        "Average by firstname",
+        "Average by semester",
         "Overall average",
         "Exit"
     };
@@ -668,16 +925,11 @@ TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
                     else
                         info_message = "Failed to load binary file.";
                     break;
-                case 16:
-                    break;
-                case 17:
-                    break;
-                case 18:
-                    break;
-                case 19:
-                    break;
-                case 20:
-                    break;
+                case 16: showNth(screen); break;
+                case 17: showNtoK(screen); break;
+                case 18: showByFullName(screen); break;
+                case 19: showAvgByGivenSemester(screen); break;
+                case 20: showOverallAverage(screen); break;
                 case 21:
                     screen.Exit();
                     break;

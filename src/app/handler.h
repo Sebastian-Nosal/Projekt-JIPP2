@@ -28,4 +28,7 @@ class Handler {
     bool saveToFile();
     double getAverageOfSemester(int semester);
     Student* getBestStudents(int& amount); 
+    Student getByIdx(int idx);
+    Student* getFromNtoK(int n, int k, int& output_length);
+    double getOverallAverage();
 };

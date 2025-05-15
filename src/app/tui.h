@@ -22,6 +22,11 @@ class TUI {
         void showBelowAverage(ftxui::ScreenInteractive& screen);
         void showAboveSemester(ftxui::ScreenInteractive& screen);
         void showBelowSemester(ftxui::ScreenInteractive& screen);
+        void showNth(ftxui::ScreenInteractive& screen);
+        void showNtoK(ftxui::ScreenInteractive& screen);
+        void showByFullName(ftxui::ScreenInteractive& screen);
+        void showAvgByGivenSemester(ftxui::ScreenInteractive& screen);
+        void showOverallAverage(ftxui::ScreenInteractive& screen);
 
     public:
         TUI(Handler& handlerRef);
