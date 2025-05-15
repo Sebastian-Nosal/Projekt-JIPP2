@@ -843,8 +843,8 @@ void TUI::showOverallAverage(ftxui::ScreenInteractive& screen) {
 }
 
 void TUI::showSize(ftxui::ScreenInteractive& screen) {
-    double size = handler.getOverallAverage();
-    std::string size_text = "Average: " + std::to_string(size);
+    int size = handler.getSize();
+    std::string size_text = "Size: " + std::to_string(size);
 
     auto back_button = ftxui::Button("Back", screen.ExitLoopClosure());
 
@@ -893,7 +893,7 @@ TUI::TUI(Handler& handlerRef) : handler(handlerRef) {
         "Get By fullname",
         "Average by semester",
         "Overall average",
-        "Get size of dataset"
+        "Get size of dataset",
         "Exit"
     };
 
