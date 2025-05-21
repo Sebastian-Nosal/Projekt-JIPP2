@@ -64,6 +64,17 @@ public:
             data[i] = elem;
     }
 
+    /// @brief Konstruktor kopiujący.
+    /// @param left Smart array który ma być skopiowany.
+    SmartArray(const SmartArray& left) {
+        _size = left.size();
+        _capacity = left.capacity();
+        data = new T[_capacity];
+        for (unsigned i=0;i<_size;i++) {
+            data[i] = left.data[i];
+        }
+    }
+
     /// @brief Destruktor, zwalnia zaalokowaną pamięć.
     ~SmartArray() {
         delete[] data;
@@ -88,11 +99,32 @@ public:
         return true;
     }
 
+    /// @brief Operator przypisania kopiującego.
+    ///
+    /// Kopiuje zawartość jednej instancji SmartArray do drugiej. Jeśli przypisywana
+    /// jest ta sama instancja (samo-przypisanie), nic się nie dzieje.
+    ///
+    /// @param other Źródłowa instancja SmartArray, z której mają zostać skopiowane dane.
+    /// @return Referencja do bieżącego obiektu po przypisaniu.
+    SmartArray& operator=(const SmartArray& other) {
+        if (this == &other) return *this; // samo-przypisanie
+    
+        delete[] data; // zwolnij starą pamięć
+    
+        _size = other._size;
+        _capacity = other._capacity;
+        data = new T[_capacity];
+        for (unsigned i = 0; i < _size; ++i) {
+            data[i] = other.data[i];
+        }
+        return *this;
+    }
+
     /// @brief Zwraca element na danym indeksie z kontrolą zakresu.
     /// @param index Indeks elementu.
     /// @return Kopia elementu.
     /// @throw std::out_of_range jeśli indeks jest nieprawidłowy.
-    T at(unsigned index){
+    T& at (unsigned index){
         if (index >= _size) throw std::out_of_range("Index out of range");
         return data[index];
     }

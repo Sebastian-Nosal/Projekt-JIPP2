@@ -126,3 +126,36 @@ TEST(SmartArrayTest, OutputToStream) {
     oss << arr;
     EXPECT_FALSE(oss.str().empty());  
 }
+
+TEST(SmartArrayTest, CopyConstructor) {
+    SmartArray<int> original(3, 42);
+    SmartArray<int> copy(original);
+
+    EXPECT_EQ(copy.size(), original.size());
+    EXPECT_EQ(copy.capacity(), original.capacity());
+    for (unsigned i = 0; i < original.size(); ++i) {
+        EXPECT_EQ(copy[i], original[i]);
+    }
+
+    copy[0] = 99;
+    EXPECT_NE(copy[0], original[0]);
+}
+
+TEST(SmartArrayTest, AssignmentOperator) {
+    SmartArray<int> a(3, 8);
+    SmartArray<int> b;
+    b = a;
+
+    EXPECT_EQ(b.size(), a.size());
+    EXPECT_EQ(b.capacity(), a.capacity());
+    for (unsigned i = 0; i < a.size(); ++i) {
+        EXPECT_EQ(b[i], a[i]);
+    }
+
+    b[0] = 99;
+    EXPECT_NE(b[0], a[0]);
+
+    b = b;
+    EXPECT_EQ(b.size(), 3u);
+    EXPECT_EQ(b[0], 99);
+}
